@@ -1,0 +1,47 @@
+@startuml
+title WarmHouse System Container Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "User", "Пользователь системы Теплый Дом")
+Person(admin, "Administrator", "Администратор из группы поддержки пользователей")
+System(WarmHouseSystem, "WarmHouse System", "Система управляет устройствами умного дома")
+
+Container_Boundary(WarmHouseSystem, "WarmHouse System") {
+  Container(UserDatabase, "SQL Database", "PostgreSQL", "Хранение пользователей, домов и привязка устройств")
+  Container(DeviceDatabase, "SQL Database", "PostgreSQL", "Хранение конфига устройств")
+  Container(Mongo, "NoSQL Database", "MongoDB", "Хранение телеметрии")
+ 
+  Container(UserIteraction, "User Iteraction", "Интерфейс пользователя и маршрутазция запросов от пользователя к сервисами")
+  Container(UserService, "User Service", "Управление пользователями (включая аутентификацию)")
+  Container(DeviceService, "Device Service", "Управение устройствами: добавление, конфигурация")
+  Container(DeviceMonitoring, "Device Monitoring", "Мониторинг устройств: сбор информации с устройств")
+  Container(NotificationService, "Notification Service", "Уведомелния пользователя по Email")
+
+  Container(Kafka, "Брокер сообщений", "Apache Kafka")
+}
+
+System_Ext(Devices, "Devices", "Устройства пользователей в домах")
+
+Rel(user, UserIteraction, "Использует систему")
+Rel(admin, UserIteraction,"Обслуживает систему")
+
+
+Rel(UserIteraction,UserService,"Перенаправление запросов на операции с пользователем")
+Rel(UserIteraction,DeviceService,"Перенаправление запросов на операции с устойствами")
+
+Rel(UserService,UserDatabase,"Пишет/читает пользовательские настройки (включая список устройств и их конфиги)")
+Rel(DeviceService,DeviceDatabase,"Пишет/читает информацию о настройках устройства")
+Rel(DeviceService,Kafka,"Отправляет команды на устройства")
+Rel(Kafka,DeviceService,"Получает фидбек о выполнении команды с устройств")
+Rel(Kafka,Devices,"Устройства получают команды от системы")
+
+
+Rel(Devices,Kafka,"Отправляет данные с датчиков устройств (телеметрию) / результат выполнения команд")
+Rel(Kafka,DeviceMonitoring,"Получение данных с датчиков устройств (телеметрии)")
+Rel(DeviceMonitoring,Mongo, "Сохранение данных с датчиков устройств (телеметрии)")
+Rel(DeviceMonitoring,Kafka, "Отправка уведомлений пользователю о критических значениях")
+Rel(Kafka,NotificationService, "Отправка уведомлений пользователю")
+@enduml
