@@ -20,7 +20,7 @@ entity House {
 entity Device {
     id: number <<generated>>
     --
-    *name: string
+    *name: text
     *serial_number: text
     house_id: number <<FK>>
     device_type_id: number <<FK>>

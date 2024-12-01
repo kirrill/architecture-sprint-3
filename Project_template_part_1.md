@@ -42,9 +42,7 @@
 
 ### 5. Визуализация контекста системы — диаграмма С4
 
-```markdown
 [Context Diagram](smart-home-monolith\diagrams\context\Context.puml)
-```
 
 # Задание 2. Проектирование микросервисной архитектуры
 
@@ -52,22 +50,17 @@
 
 **Диаграмма контейнеров (Containers)**
 
-```markdown
-[Context Diagram](smart-home-monolith\diagrams\container\Container.puml)
-```
+[Container Diagram](smart-home-monolith\diagrams\container\Container.puml)
 
 **Диаграмма компонентов (Components)**
 
-```markdown
-[Context Diagram](smart-home-monolith\diagrams\component\Component.puml)
-```
+[Component Diagram](smart-home-monolith\diagrams\component\Component.puml)
 
 **Диаграмма кода (Code)**
-```markdown
-[Context Diagram](smart-home-monolith\diagrams\code\UserController.puml)
-[Context Diagram](smart-home-monolith\diagrams\code\Device.puml)
-```
+
+[Code 1 Diagram](smart-home-monolith\diagrams\code\UserController.puml)
+[Code 2 Diagram](smart-home-monolith\diagrams\code\Device.puml)
+
 # Задание 3. Разработка ER-диаграммы
-```markdown
-[Context Diagram](smart-home-monolith\diagrams\entity\ER.puml)
-```
+
+[ER Diagram](smart-home-monolith\diagrams\entity\ER.puml)
