@@ -1,0 +1,92 @@
+@startuml
+title WarmHouse System Container Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "User", "Пользователь системы Теплый Дом")
+Person(admin, "Administrator", "Администратор из группы поддержки пользователей")
+Container_Boundary(WarmHouseSystem, "WarmHouse System") {
+  Container(UserIteraction, "User Iteraction", "Взаимодействие с пользователем")
+  Container(UserDatabase, "SQL Database", "PostgreSQL", "Хранение пользователей, домов и привязка устройств")
+  Container(Mongo, "NoSQL Database", "MongoDB", "Хранение телеметрии")
+  Container(DeviceDatabase, "SQL Database", "PostgreSQL", "Хранение конфигурации устройств")
+ 
+  Container(UserService, "User Service", "Управление пользователями (включая аутентификацию)")
+  Container(DeviceService, "Device Service", "Управение устройствами: добавление, конфигурация")
+  Container(DeviceMonitoring, "Device Monitoring", "Мониторинг устройств: сбор информации с устройств")
+  Container(NotificationService, "Notification Service", "Уведомелния пользователя по Email")
+
+  Container(MessageBroker, "Брокер сообщений")
+}
+
+Container(UserIteraction,""){
+  Component(APIGateway, "API Gateway", "KONG", "Маршрутизация API")
+  Component(WebApp, "Web App", "", "Веб приложение")
+}
+
+Container(UserService, "User Service", "Управление пользователями (включая аутентификацию)"){
+  Component(UserAPI, "User API", "HTTP API")
+  Component(AuthController, "Auth Controller", "Обработка аутентификации и авторизации")
+  Component(UserController, "User Controller", "Обработка профиля пользователя (дома, устройства)")
+  Component(UserRepositoryLayer, "Repository Layer", "Работа с БД")
+}
+
+Container(DeviceService, "Device Service", "Управение устройствами: добавление, конфигурация"){
+  Component(DeviceApi, "Device API", "HTTP API")
+  Component(DeviceCommandHandler, "Device Command Handler", "Обработка команд")
+  Component(DeviceStateController, "Device State Controller", "Менеджер состояния устройств")
+  Component(DeviceRepositoryLayer, "Repository Layer", "Работа с БД")
+  Component(DeviceMessageLayer, "Message Layer", "Работа с брокером сообщений")
+}
+
+Container(DeviceMonitoring, "Device Monitoring", "Мониторинг устройств: сбор информации с устройств"){
+  Component(MonitRepositoryLayer, "Repository Layer", "Работа с БД")
+  Component(MonitMessageLayer, "Message Layer", "Работа с брокером сообщений")
+  Component(MonitDataProcessing, "Monitoring Data Processing", "Обработка данных с датчиков")
+}
+
+Container(MessageBroker, "Брокер сообщений", "Apache Kafka"){
+  Component(Kafka, "Apache Kafka")
+}
+
+System_Ext(Devices, "Devices", "Устройства пользователей в домах")
+
+Rel(user, APIGateway, "Использует систему")
+Rel(admin, APIGateway,"Обслуживает систему")
+
+Rel(APIGateway,WebApp,"Перенаправление запросов на операции пользовательского интерфейса")
+Rel(APIGateway,UserAPI,"Аутентификация пользователя и загрузка профиля")
+Rel(UserAPI,AuthController, "Аутентификация пользователя")
+Rel(UserAPI,UserController, "Загрузка профиля пользователя (дома и устройства)")
+Rel(UserController,UserRepositoryLayer, "Загрузка профиля пользователя из БД")
+Rel(UserRepositoryLayer,UserDatabase, "Пишет/читает пользовательские настройки (включая список устройств и их конфиги)")
+
+
+
+Rel(APIGateway,DeviceApi,"Отправка команды на устройство")
+Rel(DeviceApi,DeviceCommandHandler,"Отправка команды на устройство")
+Rel(DeviceCommandHandler,DeviceMessageLayer,"Отправка команды на устройство")
+Rel(DeviceMessageLayer,Kafka,"Отправка команды на устройство")
+Rel(DeviceApi,DeviceStateController,"Получение информации об устройствах в доме пользователя")
+Rel(DeviceStateController,DeviceRepositoryLayer,"Получение информации об устройствах в доме пользователя")
+
+
+
+Rel(DeviceRepositoryLayer,DeviceDatabase,"Пишет/читает информацию о настройках устройства")
+Rel(Kafka,DeviceMessageLayer,"Получает фидбек о выполнении команды с устройств")
+Rel(Kafka,Devices,"Устройства получают команды от системы")
+
+
+Rel(Devices,Kafka,"Отправляет данные с датчиков устройств (телеметрию) / результат выполнения команд")
+Rel(Kafka,MonitMessageLayer,"Получение данных с датчиков устройств (телеметрии)")
+Rel(MonitMessageLayer,MonitDataProcessing,"Обработка данных с датчиков устройств (телеметрии)")
+Rel(MonitDataProcessing,MonitRepositoryLayer,"Сохранение данных с датчиков устройств (телеметрии)")
+Rel(MonitRepositoryLayer,Mongo, "Сохранение данных с датчиков устройств (телеметрии)")
+Rel(MonitMessageLayer,Kafka, "Отправка уведомлений пользователю о критических значениях")
+Rel(Kafka,NotificationService, "Отправка уведомлений пользователю")
+
+
+
+@enduml

@@ -1,0 +1,69 @@
+@startuml
+title WarmHouse DeviceService Code Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+interface Device {
+  +int id
+  +String name
+  +boolean state
+  +void turnOn()
+  +void turnOff()
+  +boolean getState()
+}
+
+class HeatingSystemDevice {
+  +int id
+  +String name
+  +boolean state
+  +double targetTemperature
+  +double currentTemperature
+  +void turnOn()
+  +void turnOff()
+  +boolean getState()
+  +void getTemperature()
+  +void setTemperature()
+}
+
+class LightDevice {
+  +int id
+  +String name
+  +boolean state
+  +double targetBright
+  +double currentBright
+  +void turnOn()
+  +void turnOff()
+  +boolean getState()
+  +void getBright()
+  +void setBright()
+}
+
+class GateDevice {
+  +int id
+  +String name
+  +boolean state
+  +void turnOn()
+  +void turnOff()
+  +boolean getState()
+}
+
+class CVVDevice {
+  +int id
+  +String name
+  +boolean state
+  +void turnOn()
+  +void turnOff()
+  +boolean getState()
+  
+}
+
+Device --|> HeatingSystemDevice
+Device --|> LightDevice
+Device --|> GateDevice
+Device --|> CVVDevice
+
+@enduml
+
+

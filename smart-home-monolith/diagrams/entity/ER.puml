@@ -1,0 +1,49 @@
+@startuml
+title WarmHouse System ER Diagram
+
+top to bottom direction
+
+
+entity User {
+    id: number <<generated>>
+    --
+    *name: text
+}
+
+entity House {
+    id: number <<generated>>
+    --
+    *name: text
+    user_id: number <<FK>>
+}
+
+entity Device {
+    id: number <<generated>>
+    --
+    *name: text
+    *serial_number: text
+    house_id: number <<FK>>
+    device_type_id: number <<FK>>
+    state: boolean
+}
+
+entity DeviceType {
+    id: number <<generated>>
+    name: text
+}
+
+entity TelemetryData {
+    id: guid <<generated>>
+    --
+    *device_id: number <<FK>>
+    datetime: timestamp
+    data: text
+}
+
+User ||--o{ House
+House ||--o{ Device
+Device }|--|| DeviceType
+Device ||--o{ TelemetryData
+
+
+@enduml
